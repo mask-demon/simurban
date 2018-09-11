@@ -1,0 +1,6 @@
+#ignore all
+*
+
+#allow them
+!.gitignore
+!.cpp
