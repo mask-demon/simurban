@@ -3,4 +3,4 @@
 
 #allow them
 !.gitignore
-!.cpp
+!*.cpp
