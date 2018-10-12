@@ -2,6 +2,7 @@
 *
 
 #allow them
+!Makefile
 !.gitignore
 !*.cpp
 !*.h
