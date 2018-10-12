@@ -71,6 +71,7 @@ int main(int argc, char *argv[]) {
 	SDL_Surface *surface = SDL_CreateRGBSurface(0, width, hight, 32, 0, 0, 0, 0);
 	SDL_Rect rect;
 	rect.h = rect.w = 1;
+	
 	/*
 	for(int i = 0; i < 256; i++) {
 		rect.y = i;
@@ -80,7 +81,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	*/
-	
+
 	for(int i = 0; i < 256; i++) {
 		rect.y = i;
 		for(int j = 0; j < 256; j++) {
@@ -89,7 +90,7 @@ int main(int argc, char *argv[]) {
 			if(maxSquare * 4 < distSquare) SDL_FillRect(surface, &rect, SDL_MapRGB(surface->format, 255, 255, 255));
 			else {
 				double ang = atan2(i * 2 - 255, j * 2 - 255);
-				SDL_FillRect(surface, &rect, SDL_MapRGB(surface->format, std::min(255, (int)(128 * (1 + sin(ang)))), std::min(255, (int)(128 * (1 + sin(ang + M_PI * 2 / 3)))), std::min(255, (int)(128 * (1 + sin(ang + M_PI * 4 / 3))))));
+				SDL_FillRect(surface, &rect, SDL_MapRGB(surface->format, std::max(0, std::min(255, (int)(128 * (1 + 2 * sin(ang))))), std::max(0, std::min(255, (int)(128 * (1 + 2 * sin(ang + M_PI * 2 / 3))))), std::max(0, std::min(255, (int)(128 * (1 + 2 * sin(ang + M_PI * 4 / 3)))))));
 			}
 		}
 	}
@@ -104,6 +105,7 @@ int main(int argc, char *argv[]) {
 	int ypos = hight / 2, xpos = width / 2;
 	bool startOn = false;
 	bool rewrite = true;
+	bool vivid = true;
 	double phase = 0;
 	SDL_Event event;
 	while(true) {
@@ -120,9 +122,20 @@ int main(int argc, char *argv[]) {
 					xpos -= event.motion.xrel * unitLength / sizes[size];
 					rewrite = true;
 				}
+			} else if(event.type == SDL_MOUSEBUTTONUP) {
+				if(event.button.button == SDL_BUTTON_LEFT) {
+					if(0 <= event.button.y && event.button.y < iconSize && 0 <= event.button.x && event.button.x < iconSize) {
+						startOn = !startOn;
+						rewrite = true;
+					}
+				}
 			} else if(event.type == SDL_KEYUP) {
 				if(event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
 					startOn = !startOn;
+					rewrite = true;
+				}
+				if(event.key.keysym.scancode == SDL_SCANCODE_TAB) {
+					vivid = !vivid;
 					rewrite = true;
 				}
 			} else if(event.type == SDL_WINDOWEVENT) rewrite = true;
@@ -148,7 +161,7 @@ int main(int argc, char *argv[]) {
 						if(maxSquare * 4 < distSquare) SDL_FillRect(surface, &rect, SDL_MapRGB(surface->format, 255, 255, 255));
 						else {
 							double ang = atan2(i * 2 - 255, j * 2 - 255) + phase;
-							SDL_FillRect(surface, &rect, SDL_MapRGB(surface->format, std::min(255, (int)(128 * (1 + sin(ang)))), std::min(255, (int)(128 * (1 + sin(ang + M_PI * 2 / 3)))), std::min(255, (int)(128 * (1 + sin(ang + M_PI * 4 / 3))))));
+							SDL_FillRect(surface, &rect, SDL_MapRGB(surface->format, std::max(0, std::min(255, (int)(128 * (1 + (vivid + 1) * sin(ang))))), std::max(0, std::min(255, (int)(128 * (1 + (vivid + 1) * sin(ang + M_PI * 2 / 3))))), std::max(0, std::min(255, (int)(128 * (1 + (vivid + 1) * sin(ang + M_PI * 4 / 3)))))));
 						}
 					}
 				}
