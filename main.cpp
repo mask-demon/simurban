@@ -4,11 +4,13 @@
 #include <algorithm>
 
 #define _USE_MATH_DEFINES
+#include "mymath.h"
 #include <cmath>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+//parameter about render/image
 int windowWidth = 256, windowHight = 256;
 int hight = 256, width = 256;
 const int unitLength = 256;
@@ -16,6 +18,11 @@ const int iconSize = 32;
 const int interval = 40;
 const int numLevel = 15;
 const int sizes[numLevel] = {16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048};
+
+//parameter about map
+int mapSize = 256;
+const int nextx[6] = { 1,  0, -1, -1,  0,  1};
+const int nexty[6] = { 0,  1,  1,  0, -1, -1};
 
 double angularVelocity = 0.1;
 const int maxSquare = 10000;
@@ -110,20 +117,20 @@ int main(int argc, char *argv[]) {
 	SDL_Event event;
 	while(true) {
 		while(SDL_PollEvent(&event)) {
-			if(event.type == SDL_QUIT) return 0;
-			if(event.type == SDL_MOUSEWHEEL) {
+			if(event.type == SDL_QUIT) return 0;  //exit event
+			if(event.type == SDL_MOUSEWHEEL) {  //expansion event
 				size -= event.wheel.y;
 				if(size >= numLevel) size = numLevel - 1;
 				if(size < 0) size = 0;
 				rewrite = true;
-			} else if(event.type == SDL_MOUSEMOTION) {
+			} else if(event.type == SDL_MOUSEMOTION) {  //movement event
 				if(event.motion.state & SDL_BUTTON_LMASK) {
 					ypos -= event.motion.yrel * unitLength / sizes[size];
 					xpos -= event.motion.xrel * unitLength / sizes[size];
 					rewrite = true;
 				}
 			} else if(event.type == SDL_MOUSEBUTTONUP) {
-				if(event.button.button == SDL_BUTTON_LEFT) {
+				if(event.button.button == SDL_BUTTON_LEFT) {  //on/off pushed
 					if(0 <= event.button.y && event.button.y < iconSize && 0 <= event.button.x && event.button.x < iconSize) {
 						startOn = !startOn;
 						rewrite = true;
@@ -139,7 +146,7 @@ int main(int argc, char *argv[]) {
 					rewrite = true;
 				}
 			} else if(event.type == SDL_WINDOWEVENT) rewrite = true;
-			if(rewrite) {
+			if(rewrite) {  //rewriting
 				SDL_RenderClear(renderer);
 				my_RenderCopy(renderer, texture, ypos, xpos, size);
 				rect.y = rect.x = 0;
@@ -150,7 +157,7 @@ int main(int argc, char *argv[]) {
 			}
 		}		
 		{
-			if(startOn) {
+			if(startOn) {  //auto movement
 				phase += angularVelocity;
 				rect.h = rect.w = 1;
 				for(int i = 0; i < 256; i++) {

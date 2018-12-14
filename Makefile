@@ -6,3 +6,5 @@ LDLIBS := -lSDL2_image -ljpeg -lpng -ltiff -lwebp -lz -llzma -lZSTD `sdl2-config
 all: hue main
 	mv main simurban
 	rm -f *.o
+
+main: mymath.o
